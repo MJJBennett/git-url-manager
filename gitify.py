@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 import sys, re
 
-DEFAULT_PRINTS = 
-[
+DEFAULT_PRINTS = [
     "remote"
 ]
 
@@ -26,21 +25,20 @@ def get_info(opts):
 
     if TEMPLATE_ITEMS is None:
         script = script.replace("TEMPLATE_ITEMS = None", 
-        """TEMPLATE_ITEMS = {
-        "{0}" : {
-        "leader" : "{1}",
-        "extension" : "{2}",
-        }###ANCHOR FOR REPLACEMENT###
-        }
-        """.format(key, leader, extension), count=1)
+        "TEMPLATE_ITEMS = {\n\"" + key + "\" : {\n" +
+        "\"leader\" : \"" + leader + "\",\n" +
+        "\"extension\" : \"" + extension + "\"\n" +
+        "}###ANCHOR FOR REPLACEMENT###\n" +
+        "}", 1)
     else:
         script = script.replace("###ANCHOR FOR REPLACEMENT###", 
-        """,
-        "{0}" : {
-        "leader" : "{1}",
-        "extension" : "{2}",
-        }###ANCHOR FOR REPLACEMENT###
-        """.format(key, leader, extension), count=1)
+        ",\n" + "\"" + key + "\" : {\n" +
+        "\"leader\" : \"" + leader + "\",\n" +
+        "\"extension\" : \"" + extension + "\"\n" +
+        "}###ANCHOR FOR REPLACEMENT###", 1)
+
+    with open(__file__, 'w') as file:
+        file.write(script)
 
     if TEMPLATE_ITEMS is None:
         sys.exit(0)
@@ -87,6 +85,8 @@ def main(args):
             opts += "info"
     args = [arg for arg in args if re.match(r"-+", arg) is None] # Simple sanitization
     log = print if "verbose" in opts else no_print
+
+    get_info(opts)
         
     log("Generating URLs for input:\n" + '\n> '.join(args))
     for arg in args:
