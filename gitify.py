@@ -92,15 +92,15 @@ def main(args):
     template = "default"
     for a in args:
         if re.match(r"-+r(emote)?", a) is not None and "remote" not in opts:
-            opts += "remote"
+            opts.append("remote")
         elif re.match(r"-+c(lone)?", a) is not None and "clone" not in opts:
-            opts += "clone"
+            opts.append("clone")
         elif re.match(r"-+v(erbose)?", a) is not None and "verbose" not in opts:
-            opts += "verbose"
+            opts.append("verbose")
         elif TEMPLATE_ITEMS is not None and a.strip('- ') in TEMPLATE_ITEMS:
             template = a.strip('- ')
         elif re.match(r"-+i(nfo)?", a) is not None and "info" not in opts: 
-            opts += "info"
+            opts.append("info")
     args = [arg for arg in args if re.match(r"-+", arg) is None] # Simple sanitization
     log = print if "verbose" in opts else no_print
 
