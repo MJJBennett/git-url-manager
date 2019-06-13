@@ -58,13 +58,13 @@ def print_clone(website, agent, repo):
     print("> git clone", get_id(website, agent, repo))
 
 def get_ssh_info(url):
-    ssh_url = re.match(r"\w+@\w+\.\w+:(\w+)/([^.]+)\.git", arg)
+    ssh_url = re.match(r"\w+@\w+\.\w+:(\w+)/([^.]+)\.git", url)
     if ssh_url is not None:
         return (ssh_url.group(1), ssh_url.group(2))
     return None
 
 def get_http_info(url):
-    http_url = re.match(r"https?://(\w+)\.\w+/(\w+)/([\w\-_]+)(\.git)?", arg)
+    http_url = re.match(r"https?://(\w+)\.\w+/(\w+)/([\w\-_]+)(\.git)?", url)
     if http_url is not None:
         return (http_url.group(1), http_url.group(2), http_url.group(2))
     return None
