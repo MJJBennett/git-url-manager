@@ -49,7 +49,7 @@ def no_print(*args, **kwargs):
 
 def get_id(website, agent, repo):
     t = TEMPLATE_ITEMS[template] if template in TEMPLATE_ITEMS else TEMPLATE_ITEMS["default"]
-    return t["leader"] + ":" + agent + "/" + repo + t["extension"]
+    return t["leader"] + ":" + agent + "/" + repo + '.' + t["extension"]
 
 def print_remote(website, agent, repo):
     print("> git remote add origin", get_id(website, agent, repo))
@@ -80,8 +80,10 @@ def print_git(arg, opts):
         website, agent, repo = get_http_info(arg)
 
     if "remote" in opts:
+        log("Printing remote information.")
         print_remote(website, agent, repo)
     if "clone" in opts:
+        log("Printing clone information.")
         print_clone(website, agent, repo)
 
 def main(args):
