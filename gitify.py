@@ -6,6 +6,7 @@ DEFAULT_PRINTS = [
 ]
 
 TEMPLATE_ITEMS = None
+template = None
 
 def get_info(opts):
     if TEMPLATE_ITEMS is not None and "info" not in opts:
@@ -15,9 +16,9 @@ def get_info(opts):
         script = file.read()
 
     print("Creating template for remote URL generation.")
-    leader = input("Enter the host (host:agent/repository.extension) >")
-    extension = input("Enter the extension >")
-    key = input("Enter the template name (empty for default) >").strip('\r\n ')
+    leader = input("Enter the host (host:agent/repository.extension) > ")
+    extension = input("Enter the extension > ")
+    key = input("Enter the template name (empty for default) > ").strip('\r\n ')
     if key != '':
         print("Note: Access this template by adding '" + key + "' to queries.")
     else:
@@ -46,31 +47,46 @@ def get_info(opts):
 def no_print(*args, **kwargs):
     pass
 
-def print_from(website, agent, repo):
-    print("...Creating remote urls for username", agent, "and repo", repo +
-            ".")
-    print("> git remote add origin git-hub:" + agent + "/" + repo + ".git")
+def get_id(website, agent, repo):
+    t = TEMPLATE_ITEMS[template] if template in TEMPLATE_ITEMS else TEMPLATE_ITEMS["default"]
+    return t["leader"] + ":" + agent + "/" + repo + t["extension"]
+
+def print_remote(website, agent, repo):
+    print("> git remote add origin", get_id(website, agent, repo))
+
+def print_clone(website, agent, repo):
+    print("> git clone", get_id(website, agent, repo))
 
 def get_ssh_info(url):
     ssh_url = re.match(r"\w+@\w+\.\w+:(\w+)/([^.]+)\.git", arg)
+    if ssh_url is not None:
+        return (ssh_url.group(1), ssh_url.group(2))
+    return None
+
+def get_http_info(url):
+    http_url = re.match(r"https?://(\w+)\.\w+/(\w+)/([\w\-_]+)(\.git)?", arg)
+    if http_url is not None:
+        return (http_url.group(1), http_url.group(2), http_url.group(2))
+    return None
 
 def print_git(arg, opts):
     log = print if "verbose" in opts else no_print
 
     # Create a set of git remote urls for this url
-    if ssh_url is not None:
-        agent = ssh_url.group(1)
-        repo = ssh_url.group(2)
-        print_from(None, agent, repo)
-    http_url = re.match(r"https?://(\w+)\.\w+/(\w+)/([\w\-_]+)(\.git)?", arg)
-    if http_url is not None:
-        website = http_url.group(1)
-        agent = http_url.group(2)
-        repo = http_url.group(3)
-        print_from(website, agent, repo)
+    if get_ssh_info(arg) is not None:
+        agent, repo = get_ssh_info(arg)
+        website = None
+    elif get_http_info(arg) is not None:
+        website, agent, repo = get_http_info(arg)
+
+    if "remote" in opts:
+        print_remote(website, agent, repo)
+    if "clone" in opts:
+        print_clone(website, agent, repo)
 
 def main(args):
     opts = DEFAULT_PRINTS
+    global template
     template = "default"
     for a in args:
         if re.match(r"-+r(emote)?", a) is not None and "remote" not in opts:
