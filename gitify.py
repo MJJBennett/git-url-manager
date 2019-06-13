@@ -66,7 +66,7 @@ def get_ssh_info(url):
 def get_http_info(url):
     http_url = re.match(r"https?://(\w+)\.\w+/(\w+)/([\w\-_]+)(\.git)?", url)
     if http_url is not None:
-        return (http_url.group(1), http_url.group(2), http_url.group(2))
+        return (http_url.group(1), http_url.group(2), http_url.group(3))
     return None
 
 def print_git(arg, opts):
