@@ -57,6 +57,9 @@ def print_remote(website, agent, repo):
 def print_clone(website, agent, repo):
     print("> git clone", get_id(website, agent, repo))
 
+def print_clean(website, agent, repo):
+    print(get_id(website, agent, repo))
+
 def get_ssh_info(url):
     ssh_url = re.match(r"\w+@\w+\.\w+:(\w+)/([^.]+)\.git", url)
     if ssh_url is not None:
@@ -82,6 +85,10 @@ def print_git(arg, opts):
         log("Could not find URL information in argument:", arg)
         return
 
+    if "plumb" in opts:
+        log("Printing clean information.")
+        print_clean(website, agent, repo)
+        return
     if "remote" in opts:
         log("Printing remote information.")
         print_remote(website, agent, repo)
@@ -104,6 +111,10 @@ def main(args):
             template = a.strip('- ')
         elif re.match(r"-+i(nfo)?", a) is not None and "info" not in opts: 
             opts.append("info")
+        # "clean" overrides and only prints the actual URL output, nothing else
+        # for use in other scripts/aliases
+        elif re.match(r"-+p(lumb)?", a) is not None and "plumb" not in opts:
+            opts.append("plumb")
     args = [arg for arg in args if re.match(r"-+", arg) is None] # Simple sanitization
     # This doesn't remove 'key' arguments if given without a preceding dash
     # So we just need to remember that args might not be fully sanitized
