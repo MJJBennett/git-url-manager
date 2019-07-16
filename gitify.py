@@ -78,6 +78,9 @@ def print_git(arg, opts):
         website = None
     elif get_http_info(arg) is not None:
         website, agent, repo = get_http_info(arg)
+    else:
+        log("Could not find URL information in argument:", arg)
+        return
 
     if "remote" in opts:
         log("Printing remote information.")
@@ -102,6 +105,9 @@ def main(args):
         elif re.match(r"-+i(nfo)?", a) is not None and "info" not in opts: 
             opts.append("info")
     args = [arg for arg in args if re.match(r"-+", arg) is None] # Simple sanitization
+    # This doesn't remove 'key' arguments if given without a preceding dash
+    # So we just need to remember that args might not be fully sanitized
+
     log = print if "verbose" in opts else no_print
 
     get_info(opts)
